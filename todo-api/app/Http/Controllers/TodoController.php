@@ -12,15 +12,8 @@ class TodoController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        // Return all todos from the db
+        return Todo::all();
     }
 
     /**
@@ -28,7 +21,26 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+        ]);
+
+        // Create a new instance
+        $todo = new Todo();
+
+        // Set properties individually from the validated data
+        $todo->title = $validated['title'];
+        $todo->description = $validated['description'] ?? null;
+        $todo->due_date = $validated['due_date'] ?? null;
+
+        // Save the new instance to the database
+        $todo->save();
+
+        // Return the saved model
+        return $todo;
     }
 
     /**
