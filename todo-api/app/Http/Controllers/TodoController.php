@@ -12,8 +12,12 @@ class TodoController extends Controller
      */
     public function index()
     {
-        // Return all todos from the db
-        return Todo::all();
+        $todos = Todo::all();
+
+        return response()->json([
+            'success' => true,
+            'data' => $todos
+        ]);
     }
 
     /**
@@ -39,8 +43,12 @@ class TodoController extends Controller
         // Save the new instance to the database
         $todo->save();
 
-        // Return the saved model
-        return $todo;
+        // Return the saved model with consistent JSON response
+        return response()->json([
+            'success' => true,
+            'message' => 'Todo created successfully',
+            'data' => $todo
+        ], 201);
     }
 
     /**
@@ -48,15 +56,10 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Todo $todo)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'data' => $todo
+        ]);
     }
 
     /**
@@ -64,7 +67,27 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        // validate the request
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'completed' => 'sometimes|boolean',
+            'due_date' => 'nullable|date'
+        ]);
+
+        // update properties individually from validated data
+        foreach ($validated as $key => $value) {
+            $todo->key = $value;
+        }
+
+        // save the updated instance
+        $todo->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Todo updated successfully',
+            'data' => $todo
+        ]);
     }
 
     /**
